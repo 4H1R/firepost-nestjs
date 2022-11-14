@@ -23,7 +23,9 @@ async function main() {
   const usersData = await createFakeData(userFactory);
   await prisma.user.createMany({ data: usersData });
   const users = await prisma.user.findMany();
-  await prisma.userFollowers.createMany({ data: userFollowers(users) });
+  try {
+    await prisma.userFollowers.createMany({ data: userFollowers(users) });
+  } catch {}
 }
 
 main()
