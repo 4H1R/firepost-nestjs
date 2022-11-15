@@ -1,6 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { User } from '@prisma/client';
+import { User, Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import * as request from 'supertest';
 
@@ -32,7 +32,7 @@ export const userData = {
 
 type CreateUser = {
   prisma: PrismaService;
-  data?: Partial<User>;
+  data?: Partial<Prisma.UserCreateManyInput>;
 };
 
 export const createUser = async ({ prisma, data }: CreateUser) => {

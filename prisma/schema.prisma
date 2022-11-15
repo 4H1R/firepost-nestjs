@@ -24,21 +24,84 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  followers  UserFollowers[] @relation(name: "followers")
-  followings UserFollowers[] @relation(name: "followings")
+  followers    UserFollower[] @relation(name: "followers")
+  followings   UserFollower[] @relation(name: "followings")
+  posts        Post[]
+  postSaves    PostSave[]
+  postLikes    PostLike[]
+  postComments PostComment[]
 
   @@map("users")
 }
 
-model UserFollowers {
+model UserFollower {
   userId     Int
   followerId Int
 
   createdAt DateTime @default(now())
 
-  user     User @relation(name: "followers", fields: [userId], references: [id])
-  follower User @relation(name: "followings", fields: [followerId], references: [id])
+  user     User @relation(name: "followers", fields: [userId], references: [id], onDelete: Cascade)
+  follower User @relation(name: "followings", fields: [followerId], references: [id], onDelete: Cascade)
 
   @@id([userId, followerId])
   @@map("user_followers")
+}
+
+model Post {
+  id          Int    @id @default(autoincrement())
+  userId      Int
+  description String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  saves    PostSave[]
+  likes    PostLike[]
+  comments PostComment[]
+
+  @@map("posts")
+}
+
+model PostSave {
+  userId Int
+  postId Int
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+  @@map("post_saves")
+}
+
+model PostLike {
+  userId Int
+  postId Int
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+  @@map("post_likes")
+}
+
+model PostComment {
+  id       Int    @id @default(autoincrement())
+  text     String
+  userId   Int
+  postId   Int
+  parentId Int?
+
+  createdAt DateTime @default(now())
+
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post        Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent      PostComment?  @relation(name: "parent", fields: [parentId], references: [id])
+  subComments PostComment[] @relation(name: "parent")
+
+  @@map("post_comments")
 }

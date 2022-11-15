@@ -89,7 +89,7 @@ describe('User', () => {
   describe('Followers', () => {
     it('users can see other users followers', async () => {
       const follower = await createUser({ prisma, data: await userFactory() });
-      await prisma.userFollowers.create({
+      await prisma.userFollower.create({
         data: { userId: loginResponse.user.id, followerId: follower.id },
       });
 
@@ -121,7 +121,7 @@ describe('User', () => {
 
     it('users can follow other users twice without a problem', async () => {
       const user = await createUser({ prisma, data: await userFactory() });
-      await prisma.userFollowers.create({
+      await prisma.userFollower.create({
         data: { userId: user.id, followerId: loginResponse.user.id },
       });
 
@@ -143,14 +143,14 @@ describe('User', () => {
     it('users can un follow other users', async () => {
       const user = await createUser({ prisma, data: await userFactory() });
       const data = { userId: user.id, followerId: loginResponse.user.id };
-      await prisma.userFollowers.create({ data });
+      await prisma.userFollower.create({ data });
 
       await request(app.getHttpServer())
         .delete(`/api/users/${user.username}/followers`)
         .auth(loginResponse.accessToken, { type: 'bearer' })
         .expect(HttpStatus.OK);
 
-      const result = await prisma.userFollowers.findUnique({ where: { userId_followerId: data } });
+      const result = await prisma.userFollower.findUnique({ where: { userId_followerId: data } });
       expect(result).toBeNull();
     });
   });
@@ -158,7 +158,7 @@ describe('User', () => {
   describe('Followings', () => {
     it('users can see other users followings', async () => {
       const user = await createUser({ prisma, data: await userFactory() });
-      await prisma.userFollowers.create({
+      await prisma.userFollower.create({
         data: { followerId: loginResponse.user.id, userId: user.id },
       });
 
