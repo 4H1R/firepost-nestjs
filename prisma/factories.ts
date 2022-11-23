@@ -10,6 +10,7 @@ export const userFactory = async (): Promise<Prisma.UserCreateManyInput> => ({
     ? faker.lorem.paragraph(faker.datatype.number({ min: 1, max: 4 }))
     : null,
   isVerified: faker.datatype.boolean(),
+  website: faker.datatype.boolean() ? faker.internet.domainName() : null,
   password: await bcrypt.hash('password', 10),
   emailVerifiedAt: faker.datatype.boolean() ? new Date() : null,
 });

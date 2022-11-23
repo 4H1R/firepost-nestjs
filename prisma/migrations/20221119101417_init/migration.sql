@@ -7,6 +7,7 @@ CREATE TABLE "users" (
     "email" TEXT NOT NULL,
     "image" TEXT,
     "bio" TEXT,
+    "website" TEXT,
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
     "emailVerifiedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

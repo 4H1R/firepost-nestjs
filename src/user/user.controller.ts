@@ -15,7 +15,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
 import { UserService } from './user.service';
-import { UserResource } from './resource';
+import { ProfileResource, UserResource } from './resource';
 import { FindAllUserDto, UpdateUserDto } from './dto';
 import { CurrentUser } from 'src/auth/decorator';
 import { FollowerService } from './follower.service';
@@ -40,9 +40,9 @@ export class UserController {
 
   @Get(':username')
   @HttpCode(HttpStatus.OK)
-  async findOne(@Param('username') username: string) {
-    const user = await this.userService.findOne(username);
-    return UserResource.toJson(user);
+  async findOne(@CurrentUser() currentUser: User, @Param('username') username: string) {
+    const user = await this.userService.findOne(username, currentUser);
+    return ProfileResource.toJson(user);
   }
 
   @Patch(':username')
@@ -88,7 +88,7 @@ export class UserController {
   @HttpCode(HttpStatus.CREATED)
   async follow(@CurrentUser() currentUser: User, @Param('username') username: string) {
     if (currentUser.username === username) throw new UnauthorizedException();
-    const user = await this.userService.findOne(username);
+    const user = await this.userService.findUnique(username);
     await this.followerService.follow({
       followerId: currentUser.id,
       userId: user.id,
@@ -101,7 +101,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async unFollow(@CurrentUser() currentUser: User, @Param('username') username: string) {
     if (currentUser.username === username) throw new UnauthorizedException();
-    const user = await this.userService.findOne(username);
+    const user = await this.userService.findUnique(username);
     await this.followerService.unFollow({
       followerId: currentUser.id,
       userId: user.id,

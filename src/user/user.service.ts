@@ -16,9 +16,23 @@ export class UserService {
     });
   }
 
-  async findOne(username: string) {
+  async findOne(username: string, currentUser: User) {
+    const user = await this.prisma.user.findUnique({
+      where: { username },
+      include: {
+        _count: { select: { followers: true, followings: true, posts: true } },
+        followers: { where: { follower: currentUser }, take: 1 },
+      },
+    });
+
+    if (!user) throw new NotFoundException();
+    return user;
+  }
+
+  async findUnique(username: string) {
     const user = await this.prisma.user.findUnique({ where: { username } });
     if (!user) throw new NotFoundException();
+
     return user;
   }
 
