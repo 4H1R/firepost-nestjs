@@ -4,7 +4,7 @@ import { Prisma, User, UserFollower } from '@prisma/client';
 import { paginate } from 'lib/paginator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FollowerUserDto } from './dto';
-import { createUserQuery } from './helper.user';
+import { createUserSearchQuery } from './helper.user';
 
 @Injectable()
 export class FollowerService {
@@ -16,7 +16,7 @@ export class FollowerService {
 
     const prismaQuery: Prisma.UserFollowerFindManyArgs = {
       include: { follower: true },
-      where: { userId: user.id, follower: { ...createUserQuery(query).where } },
+      where: { userId: user.id, follower: { ...createUserSearchQuery(query).where } },
     };
 
     return await paginate<UserFollower & { follower: User }, typeof prismaQuery>(
@@ -32,7 +32,7 @@ export class FollowerService {
 
     const prismaQuery: Prisma.UserFollowerFindManyArgs = {
       include: { user: true },
-      where: { followerId: user.id, user: { ...createUserQuery(query).where } },
+      where: { followerId: user.id, user: { ...createUserSearchQuery(query).where } },
     };
 
     return await paginate<UserFollower & { user: User }, typeof prismaQuery>(

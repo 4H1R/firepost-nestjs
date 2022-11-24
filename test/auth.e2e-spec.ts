@@ -82,6 +82,19 @@ describe('Auth', () => {
     });
   });
 
+  describe('Refresh', () => {
+    it('users can get a new access token', async () => {
+      const { refreshToken } = await actingAs({ prisma, app });
+
+      const response = await request(app.getHttpServer())
+        .post('/api/auth/refresh')
+        .send({ refresh: refreshToken })
+        .expect(HttpStatus.OK);
+
+      expect(response.body.refreshToken).toBe(refreshToken);
+    });
+  });
+
   afterAll(async () => {
     await app.close();
   });

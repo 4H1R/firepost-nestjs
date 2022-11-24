@@ -7,7 +7,7 @@ import * as request from 'supertest';
 import { AppModule } from 'src/app.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { applySettingsForApp } from 'src/utils';
-import { LoginResponseEntity } from 'src/auth/entity';
+import { AuthResponse } from 'src/auth/response';
 
 export const createAppForTesting = async () => {
   const moduleRef = await Test.createTestingModule({
@@ -47,11 +47,11 @@ export const createUser = async ({ prisma, data }: CreateUser) => {
 
 type ActingAs = {
   prisma: PrismaService;
-  user?: User;
   app: INestApplication;
+  user?: User;
 };
 
-export const actingAs = async ({ app, prisma, user }: ActingAs): Promise<LoginResponseEntity> => {
+export const actingAs = async ({ app, prisma, user }: ActingAs): Promise<AuthResponse> => {
   const currentUser = user ? user : await createUser({ prisma });
   const response = await request(app.getHttpServer())
     .post('/api/auth/login')

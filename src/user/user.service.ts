@@ -4,16 +4,18 @@ import { paginate } from 'lib/paginator';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FindAllUserDto, UpdateUserDto } from './dto';
-import { createUserQuery } from './helper.user';
+import { createUserSearchQuery } from './helper.user';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async findAll({ query, page }: FindAllUserDto) {
-    return await paginate<User, Prisma.UserFindManyArgs>(this.prisma.user, createUserQuery(query), {
-      page,
-    });
+    return await paginate<User, Prisma.UserFindManyArgs>(
+      this.prisma.user,
+      createUserSearchQuery(query),
+      { page },
+    );
   }
 
   async findOne(username: string, currentUser: User) {

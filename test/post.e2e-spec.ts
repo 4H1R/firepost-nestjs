@@ -3,13 +3,13 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 
 import { createAppForTesting, actingAs } from './helper.testing';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { LoginResponseEntity } from 'src/auth/entity';
 import { postFactory } from 'prisma/factories';
+import { AuthResponse } from 'src/auth/response';
 
 describe('Post', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let loginResponse: LoginResponseEntity;
+  let loginResponse: AuthResponse;
 
   beforeAll(async () => {
     const created = await createAppForTesting();

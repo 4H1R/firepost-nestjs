@@ -6,8 +6,8 @@ import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ValidationErrorException } from 'src/common/exception';
 import { LoginDto, RegisterDto } from './dto';
-import { exclude } from 'src/utils';
-import { PayloadEntity, LoginResponseEntity } from './entity';
+import { PayloadEntity } from './entity';
+import { AuthResource } from 'src/user/resource';
 
 @Injectable()
 export class AuthService {
@@ -39,7 +39,7 @@ export class AuthService {
     return this.createAuthResponse(createdUser);
   }
 
-  public async login(loginDto: LoginDto): Promise<LoginResponseEntity> {
+  public async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -59,8 +59,8 @@ export class AuthService {
         where: { id: token.sub },
       });
 
-      const tokens = this.createAuthResponse(user);
-      return exclude(tokens, 'refreshToken');
+      const result = this.createAuthResponse(user);
+      return { ...result, refreshToken };
     } catch (e) {
       // token is not signed by us
       throw new UnauthorizedException();
@@ -68,7 +68,7 @@ export class AuthService {
   }
 
   public me(user: User) {
-    return exclude(user, 'password');
+    return AuthResource.toJson(user);
   }
 
   private createAuthResponse(user: User) {

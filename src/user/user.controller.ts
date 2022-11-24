@@ -88,6 +88,7 @@ export class UserController {
   @HttpCode(HttpStatus.CREATED)
   async follow(@CurrentUser() currentUser: User, @Param('username') username: string) {
     if (currentUser.username === username) throw new UnauthorizedException();
+
     const user = await this.userService.findUnique(username);
     await this.followerService.follow({
       followerId: currentUser.id,
@@ -101,6 +102,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async unFollow(@CurrentUser() currentUser: User, @Param('username') username: string) {
     if (currentUser.username === username) throw new UnauthorizedException();
+
     const user = await this.userService.findUnique(username);
     await this.followerService.unFollow({
       followerId: currentUser.id,
