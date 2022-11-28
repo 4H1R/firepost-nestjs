@@ -52,6 +52,7 @@ model Post {
   id          Int    @id @default(autoincrement())
   userId      Int
   description String
+  image       String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

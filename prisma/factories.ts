@@ -9,8 +9,9 @@ export const userFactory = async (): Promise<Prisma.UserCreateManyInput> => ({
   bio: faker.datatype.boolean()
     ? faker.lorem.paragraph(faker.datatype.number({ min: 1, max: 4 }))
     : null,
+  image: faker.datatype.boolean() ? faker.image.avatar() : null,
   isVerified: faker.datatype.boolean(),
-  website: faker.datatype.boolean() ? faker.internet.domainName() : null,
+  website: faker.datatype.boolean() ? `https://${faker.internet.domainName()}` : null,
   password: await bcrypt.hash('password', 10),
   emailVerifiedAt: faker.datatype.boolean() ? new Date() : null,
 });
@@ -21,5 +22,6 @@ type PostFactory = {
 
 export const postFactory = (data: PostFactory): Prisma.PostCreateManyInput => ({
   ...data,
+  image: faker.image.abstract(500, 500, true),
   description: faker.lorem.paragraphs(faker.datatype.number({ min: 2, max: 5 })),
 });

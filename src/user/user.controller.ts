@@ -19,7 +19,7 @@ import { ProfileResource, UserResource } from './resource';
 import { FindAllUserDto, UpdateUserDto } from './dto';
 import { CurrentUser } from 'src/auth/decorator';
 import { FollowerService } from './follower.service';
-import { FindAllDto } from 'src/common/dto';
+import { PaginateDto } from 'src/common/dto';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -65,7 +65,7 @@ export class UserController {
 
   @Get(':username/followers')
   @HttpCode(HttpStatus.OK)
-  async followers(@Param('username') username: string, @Query() query: FindAllDto) {
+  async followers(@Param('username') username: string, @Query() query: PaginateDto) {
     const result = await this.followerService.followers({ username, ...query });
 
     const data = result.data.map(({ follower }) => UserResource.toJson(follower));
@@ -74,7 +74,7 @@ export class UserController {
 
   @Get(':username/followings')
   @HttpCode(HttpStatus.OK)
-  async followings(@Param('username') username: string, @Query() query: FindAllDto) {
+  async followings(@Param('username') username: string, @Query() query: PaginateDto) {
     const result = await this.followerService.followings({
       username,
       ...query,

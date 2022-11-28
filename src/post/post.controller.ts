@@ -5,6 +5,7 @@ import { PostService } from './post.service';
 import { CreatePostDto, FindAllPostDto, UpdatePostDto } from './dto';
 import { CurrentUser } from 'src/auth/decorator';
 import { User } from '@prisma/client';
+import { PostImage } from './resource';
 
 @ApiTags('posts')
 @ApiBearerAuth()
@@ -18,8 +19,10 @@ export class PostController {
   }
 
   @Get()
-  findAll(@Query() dto: FindAllPostDto) {
-    return this.postService.findAll(dto);
+  async findAll(@Query() dto: FindAllPostDto) {
+    const posts = await this.postService.findAll(dto);
+    const data = PostImage.toArrayJson(posts.data);
+    return { ...posts, data };
   }
 
   @Get(':id')

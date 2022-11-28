@@ -12,12 +12,33 @@ export class PostService {
     return this.prisma.post.create({ data: { ...createPostDto, userId: currentUser.id } });
   }
 
-  findAll({ page }: FindAllPostDto) {
-    return paginate<Post, Prisma.PostFindManyArgs>(this.prisma.post, {}, { page });
+  findAll({ page, userId }: FindAllPostDto) {
+    const prismaQuery: Prisma.PostFindManyArgs = {
+      where: { userId: userId ? parseInt(userId, 10) : undefined },
+      orderBy: { id: 'desc' },
+    };
+
+    return paginate<Post, Prisma.PostFindManyArgs>(this.prisma.post, prismaQuery, { page });
   }
 
   findOne(id: number) {
     return `This action returns a #${id} post`;
+  }
+
+  async followingsPosts(authUser: User) {
+    const followings = await this.prisma.userFollower.findMany({
+      where: { follower: authUser },
+      select: { userId: true },
+    });
+    const followingIds = followings.map(({ userId }) => userId);
+
+    const prismaQuery: Prisma.PostFindManyArgs = {
+      where: { userId: { in: followingIds } },
+      include: { user: true },
+      orderBy: { id: 'desc' },
+    };
+
+    return paginate<Post, Prisma.PostFindManyArgs>(this.prisma.post, prismaQuery, {});
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {

@@ -6,11 +6,16 @@ import { AuthService } from './auth.service';
 import { CurrentUser, Public } from './decorator';
 import { LoginDto, RegisterDto, RefreshDto } from './dto';
 import { AuthResponse } from './response';
+import { PostService } from 'src/post/post.service';
+import { PostResource } from 'src/post/resource';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly postService: PostService,
+  ) {}
 
   @Public()
   @Post('register')
@@ -38,5 +43,14 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async me(@CurrentUser() currentUser: User) {
     return this.authService.me(currentUser);
+  }
+
+  @ApiBearerAuth()
+  @Get('posts')
+  @HttpCode(HttpStatus.OK)
+  async posts(@CurrentUser() authUser: User) {
+    const posts = await this.postService.followingsPosts(authUser);
+    const data = PostResource.toArrayJson(posts.data);
+    return { ...posts, data };
   }
 }
