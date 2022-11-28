@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as Hashids from 'hashids';
+import Hashids from 'hashids';
 
 @Injectable()
 export class HashIdsService {
