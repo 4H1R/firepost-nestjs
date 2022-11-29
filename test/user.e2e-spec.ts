@@ -1,15 +1,20 @@
 import request from 'supertest';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 
-import { createAppForTesting, actingAs, createUser, userData } from './helper.testing';
+import {
+  createAppForTesting,
+  actingAs,
+  createUser,
+  userData,
+  ActingAsResponse,
+} from './helper.testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { userFactory } from 'prisma/factories';
-import { AuthResponse } from 'src/auth/response';
 
 describe('User', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let loginResponse: AuthResponse;
+  let loginResponse: ActingAsResponse;
 
   beforeAll(async () => {
     const created = await createAppForTesting();
@@ -90,7 +95,7 @@ describe('User', () => {
     it('users can see other users followers', async () => {
       const follower = await createUser({ prisma, data: await userFactory() });
       await prisma.userFollower.create({
-        data: { userId: loginResponse.user.id, followerId: follower.id },
+        data: { userId: loginResponse.decodedId, followerId: follower.id },
       });
 
       const response = await request(app.getHttpServer())
@@ -122,7 +127,7 @@ describe('User', () => {
     it('users can follow other users twice without a problem', async () => {
       const user = await createUser({ prisma, data: await userFactory() });
       await prisma.userFollower.create({
-        data: { userId: user.id, followerId: loginResponse.user.id },
+        data: { userId: user.id, followerId: loginResponse.decodedId },
       });
 
       await request(app.getHttpServer())
@@ -142,7 +147,7 @@ describe('User', () => {
 
     it('users can un follow other users', async () => {
       const user = await createUser({ prisma, data: await userFactory() });
-      const data = { userId: user.id, followerId: loginResponse.user.id };
+      const data = { userId: user.id, followerId: loginResponse.decodedId };
       await prisma.userFollower.create({ data });
 
       await request(app.getHttpServer())
@@ -159,7 +164,7 @@ describe('User', () => {
     it('users can see other users followings', async () => {
       const user = await createUser({ prisma, data: await userFactory() });
       await prisma.userFollower.create({
-        data: { followerId: loginResponse.user.id, userId: user.id },
+        data: { followerId: loginResponse.decodedId, userId: user.id },
       });
 
       const response = await request(app.getHttpServer())

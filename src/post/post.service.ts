@@ -14,7 +14,7 @@ export class PostService {
 
   findAll({ page, userId }: FindAllPostDto) {
     const prismaQuery: Prisma.PostFindManyArgs = {
-      where: { userId: userId ? parseInt(userId, 10) : undefined },
+      where: { userId: userId ?? undefined },
       orderBy: { id: 'desc' },
     };
 
@@ -22,7 +22,7 @@ export class PostService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} post`;
+    return { id };
   }
 
   async followingsPosts(authUser: User) {

@@ -2,7 +2,7 @@ import { Post, User } from '@prisma/client';
 
 import { JsonResource } from 'src/common/resource';
 import { UserResource } from 'src/user/resource';
-import { PostImage } from './postImage.resource';
+import { PostImageResource } from './post-image.resource';
 
 type Props = {
   user: User;
@@ -10,7 +10,7 @@ type Props = {
 
 export class PostResource extends JsonResource {
   public static toJson(data: Post & Props) {
-    const post = PostImage.toJson(data);
+    const post = PostImageResource.toJson(data);
     const user = UserResource.toJson(data.user);
     return { ...post, user };
   }

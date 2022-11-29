@@ -6,7 +6,7 @@ import request from 'supertest';
 
 import { AppModule } from 'src/app.module';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { applySettingsForApp } from 'src/utils';
+import { applySettingsForApp, hashIds } from 'src/utils';
 import { AuthResponse } from 'src/auth/response';
 
 export const createAppForTesting = async () => {
@@ -51,11 +51,15 @@ type ActingAs = {
   user?: User;
 };
 
-export const actingAs = async ({ app, prisma, user }: ActingAs): Promise<AuthResponse> => {
+export interface ActingAsResponse extends AuthResponse {
+  decodedId: number;
+}
+
+export const actingAs = async ({ app, prisma, user }: ActingAs): Promise<ActingAsResponse> => {
   const currentUser = user ? user : await createUser({ prisma });
   const response = await request(app.getHttpServer())
     .post('/api/auth/login')
     .send({ email: currentUser.email, password: 'password' });
 
-  return response.body;
+  return { ...response.body, decodedId: hashIds.decode(response.body.user.id)[0] };
 };

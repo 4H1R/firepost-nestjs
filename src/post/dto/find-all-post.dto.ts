@@ -5,5 +5,5 @@ import { PaginateDto } from 'src/common/dto';
 export class FindAllPostDto extends PaginateDto {
   @IsNumberString()
   @IsOptional()
-  userId?: string;
+  userId?: number;
 }

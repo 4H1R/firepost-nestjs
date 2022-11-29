@@ -1,2 +1,2 @@
 export * from './post.resource';
-export * from './postImage.resource';
+export * from './post-image.resource';

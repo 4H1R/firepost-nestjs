@@ -2,10 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { PostService } from './post.service';
-import { CreatePostDto, FindAllPostDto, UpdatePostDto } from './dto';
+import { CreatePostDto, UpdatePostDto } from './dto';
 import { CurrentUser } from 'src/auth/decorator';
 import { User } from '@prisma/client';
-import { PostImage } from './resource';
+import { PostImageResource } from './resource';
+import { PaginateDto } from 'src/common/dto';
+import { ParseHashIdsPipe } from 'src/common/pipe';
 
 @ApiTags('posts')
 @ApiBearerAuth()
@@ -19,15 +21,15 @@ export class PostController {
   }
 
   @Get()
-  async findAll(@Query() dto: FindAllPostDto) {
+  async findAll(@Query() dto: PaginateDto) {
     const posts = await this.postService.findAll(dto);
-    const data = PostImage.toArrayJson(posts.data);
+    const data = PostImageResource.toArrayJson(posts.data);
     return { ...posts, data };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.postService.findOne(+id);
+  findOne(@Param('id', new ParseHashIdsPipe()) id) {
+    return this.postService.findOne(id);
   }
 
   @Patch(':id')

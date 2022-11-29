@@ -2,6 +2,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import Hashids from 'hashids';
 
 import { ValidationErrorException } from 'src/common/exception/validation.exception';
 
@@ -35,3 +36,5 @@ export const applySettingsForApp = (app: INestApplication) => {
     }),
   );
 };
+
+export const hashIds = new Hashids(process.env.HASHIDS_SALT, 10);

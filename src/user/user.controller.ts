@@ -20,6 +20,9 @@ import { FindAllUserDto, UpdateUserDto } from './dto';
 import { CurrentUser } from 'src/auth/decorator';
 import { FollowerService } from './follower.service';
 import { PaginateDto } from 'src/common/dto';
+import { PostService } from 'src/post/post.service';
+import { PostImageResource } from 'src/post/resource';
+import { ParseUsernamePipe } from 'src/common/pipe';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -28,6 +31,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly followerService: FollowerService,
+    private readonly postService: PostService,
   ) {}
 
   @Get()
@@ -40,7 +44,10 @@ export class UserController {
 
   @Get(':username')
   @HttpCode(HttpStatus.OK)
-  async findOne(@CurrentUser() currentUser: User, @Param('username') username: string) {
+  async findOne(
+    @CurrentUser() currentUser: User,
+    @Param('username', new ParseUsernamePipe()) username: string,
+  ) {
     const user = await this.userService.findOne(username, currentUser);
     return ProfileResource.toJson(user);
   }
@@ -48,7 +55,7 @@ export class UserController {
   @Patch(':username')
   @HttpCode(HttpStatus.OK)
   update(
-    @Param('username') username: string,
+    @Param('username', new ParseUsernamePipe()) username: string,
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() currentUser: User,
   ) {
@@ -58,14 +65,20 @@ export class UserController {
 
   @Delete(':username')
   @HttpCode(HttpStatus.OK)
-  remove(@Param('username') username: string, @CurrentUser() currentUser: User) {
+  remove(
+    @Param('username', new ParseUsernamePipe()) username: string,
+    @CurrentUser() currentUser: User,
+  ) {
     if (currentUser.username !== username) throw new UnauthorizedException();
     return this.userService.remove(username);
   }
 
   @Get(':username/followers')
   @HttpCode(HttpStatus.OK)
-  async followers(@Param('username') username: string, @Query() query: PaginateDto) {
+  async followers(
+    @Param('username', new ParseUsernamePipe()) username: string,
+    @Query() query: PaginateDto,
+  ) {
     const result = await this.followerService.followers({ username, ...query });
 
     const data = result.data.map(({ follower }) => UserResource.toJson(follower));
@@ -74,7 +87,10 @@ export class UserController {
 
   @Get(':username/followings')
   @HttpCode(HttpStatus.OK)
-  async followings(@Param('username') username: string, @Query() query: PaginateDto) {
+  async followings(
+    @Param('username', new ParseUsernamePipe()) username: string,
+    @Query() query: PaginateDto,
+  ) {
     const result = await this.followerService.followings({
       username,
       ...query,
@@ -86,7 +102,10 @@ export class UserController {
 
   @Post(':username/followers')
   @HttpCode(HttpStatus.CREATED)
-  async follow(@CurrentUser() currentUser: User, @Param('username') username: string) {
+  async follow(
+    @CurrentUser() currentUser: User,
+    @Param('username', new ParseUsernamePipe()) username: string,
+  ) {
     if (currentUser.username === username) throw new UnauthorizedException();
 
     const user = await this.userService.findUnique(username);
@@ -100,7 +119,10 @@ export class UserController {
 
   @Delete(':username/followers')
   @HttpCode(HttpStatus.OK)
-  async unFollow(@CurrentUser() currentUser: User, @Param('username') username: string) {
+  async unFollow(
+    @CurrentUser() currentUser: User,
+    @Param('username', new ParseUsernamePipe()) username: string,
+  ) {
     if (currentUser.username === username) throw new UnauthorizedException();
 
     const user = await this.userService.findUnique(username);
@@ -110,5 +132,17 @@ export class UserController {
     });
 
     return { message: `You un followed ${user.username} Successfully.` };
+  }
+
+  @Get(':username/posts')
+  @HttpCode(HttpStatus.OK)
+  async posts(
+    @Param('username', new ParseUsernamePipe()) username: string,
+    @Query() dto: PaginateDto,
+  ) {
+    const user = await this.userService.findUnique(username);
+    const posts = await this.postService.findAll({ ...dto, userId: user.id });
+    const data = PostImageResource.toArrayJson(posts.data);
+    return { ...posts, data };
   }
 }

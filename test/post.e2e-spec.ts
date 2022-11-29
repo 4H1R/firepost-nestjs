@@ -1,15 +1,15 @@
 import request from 'supertest';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 
-import { createAppForTesting, actingAs } from './helper.testing';
+import { createAppForTesting, actingAs, ActingAsResponse } from './helper.testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { postFactory } from 'prisma/factories';
-import { AuthResponse } from 'src/auth/response';
+import { hashIds } from 'src/utils';
 
 describe('Post', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let loginResponse: AuthResponse;
+  let loginResponse: ActingAsResponse;
 
   beforeAll(async () => {
     const created = await createAppForTesting();
@@ -34,11 +34,11 @@ describe('Post', () => {
   describe('Find One', () => {
     it('users can get one post', async () => {
       const post = await prisma.post.create({
-        data: postFactory({ userId: loginResponse.user.id }),
+        data: postFactory({ userId: loginResponse.decodedId }),
       });
 
       return request(app.getHttpServer())
-        .get(`/api/posts/${post.id}`)
+        .get(`/api/posts/${hashIds.encode(post.id)}`)
         .auth(loginResponse.accessToken, { type: 'bearer' })
         .expect(HttpStatus.OK);
     });
