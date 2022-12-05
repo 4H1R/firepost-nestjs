@@ -8,5 +8,6 @@ import { PostModule } from 'src/post/post.module';
   imports: [PostModule],
   controllers: [UserController],
   providers: [UserService, FollowerService],
+  exports: [UserService],
 })
 export class UserModule {}

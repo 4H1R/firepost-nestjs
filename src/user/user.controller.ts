@@ -19,7 +19,7 @@ import { ProfileResource, UserResource } from './resource';
 import { FindAllUserDto, UpdateUserDto } from './dto';
 import { CurrentUser } from 'src/auth/decorator';
 import { FollowerService } from './follower.service';
-import { PaginateDto } from 'src/common/dto';
+import { FindAllDto, PaginateDto } from 'src/common/dto';
 import { PostService } from 'src/post/post.service';
 import { PostImageResource } from 'src/post/resource';
 import { ParseUsernamePipe } from 'src/common/pipe';
@@ -77,7 +77,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async followers(
     @Param('username', new ParseUsernamePipe()) username: string,
-    @Query() query: PaginateDto,
+    @Query() query: FindAllDto,
   ) {
     const result = await this.followerService.followers({ username, ...query });
 
@@ -89,7 +89,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async followings(
     @Param('username', new ParseUsernamePipe()) username: string,
-    @Query() query: PaginateDto,
+    @Query() query: FindAllDto,
   ) {
     const result = await this.followerService.followings({
       username,
@@ -124,7 +124,6 @@ export class UserController {
     @Param('username', new ParseUsernamePipe()) username: string,
   ) {
     if (currentUser.username === username) throw new UnauthorizedException();
-
     const user = await this.userService.findUnique(username);
     await this.followerService.unFollow({
       followerId: currentUser.id,

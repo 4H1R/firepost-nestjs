@@ -1,6 +1,7 @@
 import { Post, Prisma, PrismaClient, User } from '@prisma/client';
 import { faker } from '@faker-js/faker';
-import { postFactory, userFactory } from './factories';
+
+import { messageFactory, postFactory, userFactory } from './factories';
 
 const CREATE_COUNT = 50;
 
@@ -22,15 +23,32 @@ const userFollowers = (users: User[]) => {
 };
 
 const userPosts = (users: User[]) => {
-  return users.reduce((curr, user) => {
+  const posts = users.reduce((curr, user) => {
     const posts = Array(faker.datatype.number({ min: 0, max: 20 }))
       .fill(null)
       .map(() => postFactory({ userId: user.id }));
     curr.push(...posts);
     return curr;
   }, [] as Prisma.PostCreateManyInput[]);
+
+  return faker.helpers.shuffle(posts);
 };
 
+const userMessages = (users: User[]) => {
+  const messages = users.reduce((curr, user) => {
+    const messages = Array(faker.datatype.number({ min: 0, max: 20 }))
+      .fill(null)
+      .map(() => {
+        let senderId = user.id;
+        while (senderId === user.id) senderId = faker.helpers.arrayElement(users).id;
+        return messageFactory({ userId: user.id, senderId });
+      });
+    curr.push(...messages);
+    return curr;
+  }, [] as Prisma.MessageCreateManyInput[]);
+
+  return faker.helpers.shuffle(messages);
+};
 const postSaves = (users: User[], posts: Post[]) => {
   return users.reduce((curr, user) => {
     const result = faker.helpers
@@ -59,6 +77,7 @@ async function main() {
   const posts = await prisma.post.findMany({ take: createdPostsCount, orderBy: { id: 'desc' } });
   await prisma.postSave.createMany({ data: postSaves(users, posts) });
   await prisma.postLike.createMany({ data: postLikes(users, posts) });
+  await prisma.message.createMany({ data: userMessages(users) });
 }
 
 main()

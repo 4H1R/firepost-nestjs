@@ -25,3 +25,13 @@ export const postFactory = (data: PostFactory): Prisma.PostCreateManyInput => ({
   image: faker.image.abstract(500, 500, true),
   description: faker.lorem.paragraphs(faker.datatype.number({ min: 2, max: 5 })),
 });
+
+type MessageFactory = {
+  userId: number;
+  senderId: number;
+};
+
+export const messageFactory = (data: MessageFactory): Prisma.MessageCreateManyInput => ({
+  ...data,
+  text: faker.lorem.words(faker.datatype.number({ min: 2, max: 30 })),
+});

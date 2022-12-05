@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JwtAuthGuard } from './auth/guard';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
+import { MessageModule } from './message/message.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -16,6 +17,7 @@ import configuration from './config/configuration';
     AuthModule,
     UserModule,
     PostModule,
+    MessageModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })

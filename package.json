@@ -20,7 +20,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --runInBand --config ./test/jest-e2e.json",
+    "pretest:e2e": "dotenv -e .env.test -- npx prisma migrate reset --skip-seed --force",
+    "test:e2e": "dotenv -e .env.test -- jest --runInBand --config ./test/jest-e2e.json",
     "test:int": "jest -i --no-cache --watch --config ./jest-int.json",
     "prepare": "husky install"
   },
