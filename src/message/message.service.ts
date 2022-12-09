@@ -4,7 +4,7 @@ import { paginate } from 'lib/paginator';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createUserSearchQuery } from 'src/user/helper.user';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/service';
 import { UpdateMessageDto } from './dto';
 import { ICreateMessage, IFindAllMessages, IFindOneMessage } from './interface';
 

@@ -1,10 +1,10 @@
 import { Controller, Get, HttpCode, HttpStatus, Param, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
-import { PostService } from './post.service';
-import { PostImageResource } from './resource';
+import { PostService } from '../service';
+import { PostImageResource } from '../resource';
 import { PaginateDto } from 'src/common/dto';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/service';
 import { ParseUsernamePipe } from 'src/common/pipe';
 
 @ApiTags('posts')

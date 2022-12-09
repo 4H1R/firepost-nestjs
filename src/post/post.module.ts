@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 
-import { PostService } from './post.service';
-import { PostController } from './post.controller';
-import { UserPostController } from './user-post.controller';
 import { UserModule } from 'src/user/user.module';
+import { PostController, UserPostController, PostLikeController } from './controller';
+import { PostLikeService, PostService } from './service';
 
 @Module({
   imports: [UserModule],
-  controllers: [PostController, UserPostController],
-  providers: [PostService],
+  controllers: [PostController, UserPostController, PostLikeController],
+  providers: [PostService, PostLikeService],
   exports: [PostService],
 })
 export class PostModule {}

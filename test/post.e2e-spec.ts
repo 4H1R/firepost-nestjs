@@ -49,6 +49,67 @@ describe('Post', () => {
     });
   });
 
+  describe('Likers', () => {
+    it('users can get list of post likers', async () => {
+      const post = await prisma.post.create({
+        data: postFactory({ userId: loginResponse.decodedId }),
+      });
+
+      return request(app.getHttpServer())
+        .get(`/api/posts/${hashIds.encode(post.id)}/likes`)
+        .auth(loginResponse.accessToken, { type: 'bearer' })
+        .expect(HttpStatus.OK);
+    });
+  });
+
+  describe('Like', () => {
+    it('users can like posts', async () => {
+      const post = await prisma.post.create({
+        data: postFactory({ userId: loginResponse.decodedId }),
+      });
+
+      await request(app.getHttpServer())
+        .post(`/api/posts/${hashIds.encode(post.id)}/likes`)
+        .auth(loginResponse.accessToken, { type: 'bearer' })
+        .expect(HttpStatus.CREATED);
+
+      const result = await prisma.postLike.findUnique({
+        where: {
+          userId_postId: {
+            userId: post.userId,
+            postId: post.id,
+          },
+        },
+      });
+
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('UnLike', () => {
+    it('users can un like posts', async () => {
+      const post = await prisma.post.create({
+        data: postFactory({ userId: loginResponse.decodedId }),
+      });
+
+      await request(app.getHttpServer())
+        .delete(`/api/posts/${hashIds.encode(post.id)}/likes`)
+        .auth(loginResponse.accessToken, { type: 'bearer' })
+        .expect(HttpStatus.OK);
+
+      const result = await prisma.postLike.findUnique({
+        where: {
+          userId_postId: {
+            userId: post.userId,
+            postId: post.id,
+          },
+        },
+      });
+
+      expect(result).toBeNull();
+    });
+  });
+
   afterAll(async () => {
     await app.close();
   });

@@ -12,10 +12,9 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
-import { UserService } from './user.service';
-import { UserResource } from './resource';
+import { UserService, FollowerService } from '../service';
+import { UserResource } from '../resource';
 import { CurrentUser } from 'src/auth/decorator';
-import { FollowerService } from './follower.service';
 import { FindAllDto } from 'src/common/dto';
 import { ParseUsernamePipe } from 'src/common/pipe';
 

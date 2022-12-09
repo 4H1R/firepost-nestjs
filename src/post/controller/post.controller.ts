@@ -11,12 +11,12 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-
-import { PostService } from './post.service';
-import { CreatePostDto, UpdatePostDto } from './dto';
-import { CurrentUser } from 'src/auth/decorator';
 import { User } from '@prisma/client';
-import { PostImageResource, PostResource } from './resource';
+
+import { PostService } from '../service/post.service';
+import { CreatePostDto, UpdatePostDto } from '../dto';
+import { CurrentUser } from 'src/auth/decorator';
+import { PostImageResource, PostResource } from '../resource';
 import { PaginateDto } from 'src/common/dto';
 import { ParseHashIdsPipe } from 'src/common/pipe';
 

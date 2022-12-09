@@ -13,11 +13,10 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
-import { UserService } from './user.service';
-import { AuthResource, ProfileResource, UserResource } from './resource';
-import { FindAllUserDto, UpdateUserDto } from './dto';
+import { UserService } from '../service';
+import { AuthResource, ProfileResource, UserResource } from '../resource';
+import { FindAllUserDto, UpdateUserDto } from '../dto';
 import { CurrentUser } from 'src/auth/decorator';
-import { FollowerService } from './follower.service';
 import { ParseUsernamePipe } from 'src/common/pipe';
 
 @ApiTags('users')

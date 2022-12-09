@@ -3,7 +3,7 @@ import { Post, Prisma, User } from '@prisma/client';
 import { paginate } from 'lib/paginator';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePostDto, FindAllPostDto, UpdatePostDto } from './dto';
+import { CreatePostDto, FindAllPostDto, UpdatePostDto } from '../dto';
 
 @Injectable()
 export class PostService {
@@ -27,6 +27,12 @@ export class PostService {
       include: { user: true, _count: { select: { likes: true } } },
     });
 
+    if (!post) throw new NotFoundException();
+    return post;
+  }
+
+  async findUnique(id: number) {
+    const post = await this.prisma.post.findUnique({ where: { id } });
     if (!post) throw new NotFoundException();
     return post;
   }

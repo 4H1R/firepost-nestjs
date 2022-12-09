@@ -5,7 +5,7 @@ import { AuthService } from './auth.service';
 import { Public } from './decorator';
 import { LoginDto, RegisterDto, RefreshDto } from './dto';
 import { AuthResponse } from './response';
-import { PostService } from 'src/post/post.service';
+import { PostService } from 'src/post/service';
 
 @ApiTags('auth')
 @Controller('auth')

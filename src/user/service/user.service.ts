@@ -3,8 +3,8 @@ import { Prisma, User } from '@prisma/client';
 import { paginate } from 'lib/paginator';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { FindAllUserDto, UpdateUserDto } from './dto';
-import { createUserSearchQuery } from './helper.user';
+import { FindAllUserDto, UpdateUserDto } from '../dto';
+import { createUserSearchQuery } from '../helper.user';
 
 @Injectable()
 export class UserService {
