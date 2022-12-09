@@ -15,7 +15,7 @@ export class MessageService {
   async create({ username, dto, currentUser }: ICreateMessage) {
     const user = await this.userService.findUnique(username);
     return this.prisma.message.create({
-      data: { text: dto.text, userId: user.id, senderId: currentUser.id },
+      data: { text: dto.text.trim(), userId: user.id, senderId: currentUser.id },
     });
   }
 
@@ -25,17 +25,27 @@ export class MessageService {
       {
         where: {
           ...createUserSearchQuery(query.query).where,
-          messages: { some: { OR: [{ senderId: currentUser.id }, { userId: currentUser.id }] } },
+          messages: { some: { sender: currentUser } },
         },
-        distinct: ['id'],
       },
       { page: query.page },
     );
   }
 
-  async findOne({ currentUser, username }: IFindOneMessage) {
+  async findOne({ currentUser, username, query }: IFindOneMessage) {
     const user = await this.userService.findUnique(username);
-    return this.prisma.message.findMany({ where: { OR: [{}] } });
+    return paginate<User, Prisma.MessageFindManyArgs>(
+      this.prisma.message,
+      {
+        where: {
+          OR: [
+            { user, sender: currentUser },
+            { user: currentUser, sender: user },
+          ],
+        },
+      },
+      { page: query.page },
+    );
   }
 
   async findUnique(id: number) {

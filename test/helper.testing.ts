@@ -8,6 +8,7 @@ import { AppModule } from 'src/app.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { applySettingsForApp, hashIds } from 'src/utils';
 import { AuthResponse } from 'src/auth/response';
+import { userFactory } from 'prisma/factories';
 
 export const createAppForTesting = async () => {
   const moduleRef = await Test.createTestingModule({
@@ -23,22 +24,16 @@ export const createAppForTesting = async () => {
   return { app, prisma };
 };
 
-export const userData = {
-  name: 'Testing User',
-  email: 'test@email.com',
-  username: 'testing.user',
-  password: 'password',
-};
-
 type CreateUser = {
   prisma: PrismaService;
-  data?: Partial<Prisma.UserCreateManyInput>;
+  data?: Partial<Prisma.UserCreateInput>;
 };
 
 export const createUser = async ({ prisma, data }: CreateUser) => {
+  const defaultData = await userFactory();
   return await prisma.user.create({
     data: {
-      ...userData,
+      ...defaultData,
       ...data,
       password: await bcrypt.hash('password', 10),
     },

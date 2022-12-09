@@ -24,9 +24,9 @@ const userFollowers = (users: User[]) => {
 
 const userPosts = (users: User[]) => {
   const posts = users.reduce((curr, user) => {
-    const posts = Array(faker.datatype.number({ min: 0, max: 20 }))
-      .fill(null)
-      .map(() => postFactory({ userId: user.id }));
+    const posts = Array.from({ length: faker.datatype.number({ min: 0, max: 20 }) }).map(() =>
+      postFactory({ userId: user.id }),
+    );
     curr.push(...posts);
     return curr;
   }, [] as Prisma.PostCreateManyInput[]);
@@ -36,13 +36,11 @@ const userPosts = (users: User[]) => {
 
 const userMessages = (users: User[]) => {
   const messages = users.reduce((curr, user) => {
-    const messages = Array(faker.datatype.number({ min: 0, max: 20 }))
-      .fill(null)
-      .map(() => {
-        let senderId = user.id;
-        while (senderId === user.id) senderId = faker.helpers.arrayElement(users).id;
-        return messageFactory({ userId: user.id, senderId });
-      });
+    const messages = Array.from({ length: faker.datatype.number({ min: 0, max: 50 }) }).map(() => {
+      let senderId = user.id;
+      while (senderId === user.id) senderId = faker.helpers.arrayElement(users).id;
+      return messageFactory({ userId: user.id, senderId });
+    });
     curr.push(...messages);
     return curr;
   }, [] as Prisma.MessageCreateManyInput[]);

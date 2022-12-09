@@ -46,8 +46,9 @@ export class MessageController {
   @Get('messages')
   async findAll(@CurrentUser() currentUser: User, @Query() query: FindAllDto) {
     const users = await this.messageService.findAll({ currentUser, query });
-    const data = UserResource.toArrayJson(users.data);
-    return { ...users, data };
+    return users;
+    // const data = UserResource.toArrayJson(users.data);
+    // return { ...users, data };
   }
 
   @Get('users/:username/messages')
@@ -57,7 +58,9 @@ export class MessageController {
     @Query() query: FindAllDto,
   ) {
     if (username === currentUser.username) throw new UnauthorizedException();
-    return this.messageService.findOne({ username, currentUser, query });
+    const messages = await this.messageService.findOne({ username, currentUser, query });
+    const data = MessageResource.toArrayJson(messages.data);
+    return { ...messages, data };
   }
 
   @Patch('messages/:id')

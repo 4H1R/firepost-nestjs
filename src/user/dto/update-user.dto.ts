@@ -1,5 +1,7 @@
 import { IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
+import { usernameValidation } from 'src/fixture';
+
 export class UpdateUserDto {
   @MaxLength(255)
   @MinLength(3)
@@ -7,9 +9,9 @@ export class UpdateUserDto {
   @IsOptional()
   name?: string;
 
-  @Matches(/^[a-zA-Z0-9._]+$/)
-  @MaxLength(31)
-  @MinLength(3)
+  @Matches(usernameValidation.regex)
+  @MaxLength(usernameValidation.max)
+  @MinLength(usernameValidation.min)
   @IsString()
   @IsOptional()
   username?: string;

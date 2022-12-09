@@ -13,7 +13,7 @@ import { AuthResource } from 'src/user/resource';
 export class AuthService {
   constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
-  public async register(registerDto: RegisterDto) {
+  async register(registerDto: RegisterDto) {
     const { password, email, username } = registerDto;
 
     const lowercasedEmail = email.toLocaleLowerCase();
@@ -39,7 +39,7 @@ export class AuthService {
     return this.createAuthResponse(createdUser);
   }
 
-  public async login(loginDto: LoginDto) {
+  async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -52,7 +52,7 @@ export class AuthService {
     return this.createAuthResponse(user);
   }
 
-  public async refresh(refreshToken: string) {
+  async refresh(refreshToken: string) {
     try {
       const token = this.jwt.verify(refreshToken);
       const user = await this.prisma.user.findUnique({
@@ -67,7 +67,7 @@ export class AuthService {
     }
   }
 
-  public me(user: User) {
+  private me(user: User) {
     return AuthResource.toJson(user);
   }
 

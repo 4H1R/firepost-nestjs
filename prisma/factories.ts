@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-export const userFactory = async (): Promise<Prisma.UserCreateManyInput> => ({
+export const userFactory = async (): Promise<Prisma.UserCreateInput> => ({
   name: faker.name.fullName(),
   username: faker.helpers.unique(faker.internet.userName),
   email: faker.helpers.unique(faker.internet.email).toLowerCase(),

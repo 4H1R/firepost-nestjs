@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { usernameValidation } from 'src/fixture';
 
-import { usernameRegex } from 'src/fixture';
 import { LoginDto } from './login.dto';
 
 export class RegisterDto extends LoginDto {
@@ -10,9 +10,9 @@ export class RegisterDto extends LoginDto {
   @IsNotEmpty()
   name: string;
 
-  @Matches(usernameRegex)
-  @MaxLength(31)
-  @MinLength(3)
+  @Matches(usernameValidation.regex)
+  @MaxLength(usernameValidation.max)
+  @MinLength(usernameValidation.min)
   @IsString()
   @IsNotEmpty()
   username: string;

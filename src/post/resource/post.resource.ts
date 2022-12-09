@@ -6,6 +6,9 @@ import { PostImageResource } from './post-image.resource';
 
 type Props = {
   user: User;
+  _count: {
+    likes: number;
+  };
 };
 
 export class PostResource extends JsonResource {

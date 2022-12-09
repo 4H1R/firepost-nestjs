@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post, Prisma, User } from '@prisma/client';
 import { paginate } from 'lib/paginator';
 
@@ -21,8 +21,14 @@ export class PostService {
     return paginate<Post, Prisma.PostFindManyArgs>(this.prisma.post, prismaQuery, { page });
   }
 
-  findOne(id: number) {
-    return { id };
+  async findOne(id: number) {
+    const post = await this.prisma.post.findUnique({
+      where: { id },
+      include: { user: true, _count: { select: { likes: true } } },
+    });
+
+    if (!post) throw new NotFoundException();
+    return post;
   }
 
   async followingsPosts(authUser: User) {

@@ -15,10 +15,6 @@ describe('Post', () => {
     const created = await createAppForTesting();
     app = created.app;
     prisma = created.prisma;
-  });
-
-  beforeEach(async () => {
-    await prisma.clearDatabase();
     loginResponse = await actingAs({ app, prisma });
   });
 
@@ -26,6 +22,15 @@ describe('Post', () => {
     it('users can get all posts', async () => {
       return request(app.getHttpServer())
         .get('/api/posts')
+        .auth(loginResponse.accessToken, { type: 'bearer' })
+        .expect(HttpStatus.OK);
+    });
+  });
+
+  describe('Home', () => {
+    it('users can get all home posts', async () => {
+      return request(app.getHttpServer())
+        .get('/api/posts/home')
         .auth(loginResponse.accessToken, { type: 'bearer' })
         .expect(HttpStatus.OK);
     });

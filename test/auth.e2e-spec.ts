@@ -1,8 +1,9 @@
 import request from 'supertest';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 
-import { createAppForTesting, createUser, userData, actingAs } from './helper.testing';
+import { createAppForTesting, createUser, actingAs } from './helper.testing';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { userFactory } from 'prisma/factories';
 
 describe('Auth', () => {
   let app: INestApplication;
@@ -14,71 +15,54 @@ describe('Auth', () => {
     prisma = created.prisma;
   });
 
-  beforeEach(async () => {
-    await prisma.clearDatabase();
-  });
-
   describe('Login', () => {
     it('users can login with correct information', async () => {
-      await createUser({ prisma });
+      const user = await createUser({ prisma });
 
       return request(app.getHttpServer())
         .post('/api/auth/login')
-        .send({ email: 'test@email.com', password: 'password' })
+        .send({ email: user.email, password: 'password' })
         .expect(HttpStatus.OK);
     });
 
     it('users cannot login with incorrect password', async () => {
-      await createUser({ prisma });
+      const user = await createUser({ prisma });
 
       return request(app.getHttpServer())
         .post('/api/auth/login')
-        .send({ email: 'test@email.com', password: 'wrong-password' })
+        .send({ email: user.email, password: 'wrong-password' })
         .expect(HttpStatus.UNPROCESSABLE_ENTITY);
     });
   });
 
   describe('Register', () => {
     it('users can register', async () => {
+      const data = await userFactory();
+
       return request(app.getHttpServer())
         .post('/api/auth/register')
-        .send(userData)
+        .send({ ...data, password: 'password' })
         .expect(HttpStatus.CREATED);
     });
 
     it('users cannot register with duplicate email', async () => {
-      await createUser({ prisma });
+      const user = await createUser({ prisma });
+      const data = await userFactory();
 
       return request(app.getHttpServer())
         .post('/api/auth/register')
-        .send({ ...userData, username: 'another.username' })
+        .send({ ...data, username: user.username })
         .expect(HttpStatus.UNPROCESSABLE_ENTITY);
     });
 
     it('users cannot register with duplicate username', async () => {
-      await createUser({ prisma });
+      const user = await createUser({ prisma });
+      const data = await userFactory();
 
       return request(app.getHttpServer())
         .post('/api/auth/register')
-        .send({ ...userData, email: 'another@email.com' })
+        .send({ ...data, email: user.email })
         .expect(HttpStatus.UNPROCESSABLE_ENTITY);
-    });
-  });
-
-  describe('Me', () => {
-    it('guest users cannot get their information', async () => {
-      return request(app.getHttpServer()).get('/api/auth/me').expect(HttpStatus.UNAUTHORIZED);
-    });
-
-    it('users can get their information', async () => {
-      const { accessToken } = await actingAs({ prisma, app });
-
-      const response = await request(app.getHttpServer())
-        .get('/api/auth/me')
-        .auth(accessToken, { type: 'bearer' })
-        .expect(HttpStatus.OK);
-
-      expect(response.body.email).toBeDefined();
     });
   });
 
