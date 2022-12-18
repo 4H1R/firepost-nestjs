@@ -6,15 +6,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostLikeDto, DeletePostLikeDto, FindAllPostLikeDto } from '../dto';
 
 @Injectable()
-export class PostLikeService {
+export class PostCommentService {
   constructor(private readonly prisma: PrismaService) {}
   async findOne(data: CreatePostLikeDto) {
     return this.prisma.postLike.findUnique({ where: { userId_postId: data } });
   }
 
   async create(data: CreatePostLikeDto) {
-    const isLiked = await this.findOne(data);
-    if (!isLiked) this.prisma.postLike.create({ data });
+    return this.findOne(data) ?? this.prisma.postLike.create({ data });
   }
 
   findAll({ page, postId }: FindAllPostLikeDto) {

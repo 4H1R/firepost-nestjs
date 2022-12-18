@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
+import { Message, Prisma, User } from '@prisma/client';
 import { paginate } from 'lib/paginator';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { createUserSearchQuery } from 'src/user/helper.user';
+import { createUserSearchQuery } from 'src/user/user.helper';
 import { UserService } from 'src/user/service';
 import { UpdateMessageDto } from './dto';
 import { ICreateMessage, IFindAllMessages, IFindOneMessage } from './interface';
@@ -34,7 +34,7 @@ export class MessageService {
 
   async findOne({ currentUser, username, query }: IFindOneMessage) {
     const user = await this.userService.findUnique(username);
-    return paginate<User, Prisma.MessageFindManyArgs>(
+    return paginate<Message, Prisma.MessageFindManyArgs>(
       this.prisma.message,
       {
         where: {
@@ -43,6 +43,7 @@ export class MessageService {
             { user: currentUser, sender: user },
           ],
         },
+        orderBy: { id: 'desc' },
       },
       { page: query.page },
     );

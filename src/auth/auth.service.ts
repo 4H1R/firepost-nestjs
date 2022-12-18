@@ -17,14 +17,15 @@ export class AuthService {
     const { password, email, username } = registerDto;
 
     const lowercasedEmail = email.toLocaleLowerCase();
-    let user = await this.prisma.user.findUnique({ where: { email: lowercasedEmail } });
-    if (user) {
-      throw new ValidationErrorException({ email: 'This email has already been taken.' });
-    }
+    const isEmailUsed = await this.prisma.user.findUnique({ where: { email: lowercasedEmail } });
+    const isUsernameUsed = await this.prisma.user.findUnique({ where: { username } });
 
-    user = await this.prisma.user.findUnique({ where: { username } });
-    if (user) {
-      throw new ValidationErrorException({ username: 'This username has already been taken.' });
+    if (isEmailUsed || isUsernameUsed) {
+      const errorMessage = 'This field has already been taken.';
+      const error: Record<string, string> = {};
+      if (isEmailUsed) error['email'] = errorMessage;
+      if (isUsernameUsed) error['username'] = errorMessage;
+      throw new ValidationErrorException(error);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);

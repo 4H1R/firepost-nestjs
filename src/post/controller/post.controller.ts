@@ -13,7 +13,7 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
-import { PostService } from '../service/post.service';
+import { PostService, PostUserService } from '../service';
 import { CreatePostDto, UpdatePostDto } from '../dto';
 import { CurrentUser } from 'src/auth/decorator';
 import { PostImageResource, PostResource } from '../resource';
@@ -24,7 +24,10 @@ import { ParseHashIdsPipe } from 'src/common/pipe';
 @ApiBearerAuth()
 @Controller('posts')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly postService: PostService,
+    private readonly postUserService: PostUserService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -42,8 +45,8 @@ export class PostController {
 
   @Get('home')
   @HttpCode(HttpStatus.OK)
-  async followingsPosts(@CurrentUser() authUser: User) {
-    const posts = await this.postService.followingsPosts(authUser);
+  async followingsPosts(@CurrentUser() currentUser: User, @Query() dto: PaginateDto) {
+    const posts = await this.postUserService.followingsPosts({ currentUser, dto });
     const data = PostResource.toArrayJson(posts.data);
     return { ...posts, data };
   }

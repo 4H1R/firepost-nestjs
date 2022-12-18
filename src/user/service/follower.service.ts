@@ -4,7 +4,7 @@ import { Prisma, User, UserFollower } from '@prisma/client';
 import { paginate } from 'lib/paginator';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { FollowerUserDto } from '../dto';
-import { createUserSearchQuery } from '../helper.user';
+import { createUserSearchQuery } from '../user.helper';
 
 @Injectable()
 export class FollowerService {

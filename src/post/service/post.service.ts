@@ -2,8 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Post, Prisma, User } from '@prisma/client';
 import { paginate } from 'lib/paginator';
 
+import { PaginateDto } from 'src/common/dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePostDto, FindAllPostDto, UpdatePostDto } from '../dto';
+import { CreatePostDto, UpdatePostDto } from '../dto';
+import { includePostData } from '../post.helper';
 
 @Injectable()
 export class PostService {
@@ -12,19 +14,16 @@ export class PostService {
     return this.prisma.post.create({ data: { ...createPostDto, userId: currentUser.id } });
   }
 
-  findAll({ page, userId }: FindAllPostDto) {
-    const prismaQuery: Prisma.PostFindManyArgs = {
-      where: { userId: userId ?? undefined },
-      orderBy: { id: 'desc' },
-    };
+  findAll({ page }: PaginateDto) {
+    const prismaQuery: Prisma.PostFindManyArgs = { orderBy: { id: 'desc' } };
 
     return paginate<Post, Prisma.PostFindManyArgs>(this.prisma.post, prismaQuery, { page });
   }
 
   async findOne(id: number) {
     const post = await this.prisma.post.findUnique({
+      include: includePostData({ currentUserId: 2 }),
       where: { id },
-      include: { user: true, _count: { select: { likes: true } } },
     });
 
     if (!post) throw new NotFoundException();
@@ -35,22 +34,6 @@ export class PostService {
     const post = await this.prisma.post.findUnique({ where: { id } });
     if (!post) throw new NotFoundException();
     return post;
-  }
-
-  async followingsPosts(authUser: User) {
-    const followings = await this.prisma.userFollower.findMany({
-      where: { follower: authUser },
-      select: { userId: true },
-    });
-    const followingIds = followings.map(({ userId }) => userId);
-
-    const prismaQuery: Prisma.PostFindManyArgs = {
-      where: { userId: { in: followingIds } },
-      include: { user: true },
-      orderBy: { id: 'desc' },
-    };
-
-    return paginate<Post, Prisma.PostFindManyArgs>(this.prisma.post, prismaQuery, {});
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {

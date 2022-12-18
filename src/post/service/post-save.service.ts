@@ -1,30 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { PostLike, Prisma, User } from '@prisma/client';
+import { PostSave, Prisma, User } from '@prisma/client';
 import { paginate } from 'lib/paginator';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostLikeDto, DeletePostLikeDto, FindAllPostLikeDto } from '../dto';
 
 @Injectable()
-export class PostLikeService {
+export class PostSaveService {
   constructor(private readonly prisma: PrismaService) {}
   async findOne(data: CreatePostLikeDto) {
-    return this.prisma.postLike.findUnique({ where: { userId_postId: data } });
+    return this.prisma.postSave.findUnique({ where: { userId_postId: data } });
   }
 
   async create(data: CreatePostLikeDto) {
-    const isLiked = await this.findOne(data);
-    if (!isLiked) this.prisma.postLike.create({ data });
+    return this.findOne(data) ?? this.prisma.postSave.create({ data });
   }
 
   findAll({ page, postId }: FindAllPostLikeDto) {
-    const prismaQuery: Prisma.PostLikeFindManyArgs = {
+    const prismaQuery: Prisma.PostSaveFindManyArgs = {
       where: { postId },
       include: { user: true },
     };
 
-    return paginate<PostLike & { user: User }, Prisma.PostLikeFindManyArgs>(
-      this.prisma.postLike,
+    return paginate<PostSave & { user: User }, Prisma.PostSaveFindManyArgs>(
+      this.prisma.postSave,
       prismaQuery,
       {
         page,
@@ -34,6 +33,6 @@ export class PostLikeService {
 
   async remove(data: DeletePostLikeDto) {
     const isLiked = await this.findOne(data);
-    if (isLiked) this.prisma.postLike.delete({ where: { userId_postId: data } });
+    if (isLiked) this.prisma.postSave.delete({ where: { userId_postId: data } });
   }
 }

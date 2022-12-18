@@ -5,15 +5,11 @@ import { AuthService } from './auth.service';
 import { Public } from './decorator';
 import { LoginDto, RegisterDto, RefreshDto } from './dto';
 import { AuthResponse } from './response';
-import { PostService } from 'src/post/service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly postService: PostService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('register')

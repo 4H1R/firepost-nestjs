@@ -46,9 +46,8 @@ export class MessageController {
   @Get('messages')
   async findAll(@CurrentUser() currentUser: User, @Query() query: FindAllDto) {
     const users = await this.messageService.findAll({ currentUser, query });
-    return users;
-    // const data = UserResource.toArrayJson(users.data);
-    // return { ...users, data };
+    const data = UserResource.toArrayJson(users.data);
+    return { ...users, data };
   }
 
   @Get('users/:username/messages')
