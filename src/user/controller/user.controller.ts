@@ -68,6 +68,6 @@ export class UserController {
     @CurrentUser() currentUser: User,
   ) {
     if (currentUser.username !== username) throw new UnauthorizedException();
-    return this.userService.remove(username);
+    return this.userService.remove(currentUser.id);
   }
 }

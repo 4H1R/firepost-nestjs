@@ -25,6 +25,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  accessTokens AccessToken[]
   followers    UserFollower[] @relation(name: "followers")
   followings   UserFollower[] @relation(name: "followings")
   posts        Post[]
@@ -35,6 +36,20 @@ model User {
   messages     Message[]      @relation(name: "receivings")
 
   @@map("users")
+}
+
+model AccessToken {
+  id     Int    @id @default(autoincrement())
+  name   String
+  userId Int
+  token  String
+
+  usedAt    DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("access_tokens")
 }
 
 model UserFollower {
@@ -119,8 +134,8 @@ model Message {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sender User @relation(name: "sendings", fields: [senderId], references: [id])
-  user   User @relation(name: "receivings", fields: [userId], references: [id])
+  sender User @relation(name: "sendings", fields: [senderId], references: [id], onDelete: Cascade)
+  user   User @relation(name: "receivings", fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("messages")
 }

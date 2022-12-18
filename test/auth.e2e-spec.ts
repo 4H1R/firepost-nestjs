@@ -21,7 +21,7 @@ describe('Auth', () => {
 
       return request(app.getHttpServer())
         .post('/api/auth/login')
-        .send({ email: user.email, password: 'password' })
+        .send({ email: user.email, password: 'password', deviceName: 'Samsung S21' })
         .expect(HttpStatus.OK);
     });
 
@@ -30,7 +30,7 @@ describe('Auth', () => {
 
       return request(app.getHttpServer())
         .post('/api/auth/login')
-        .send({ email: user.email, password: 'wrong-password' })
+        .send({ email: user.email, password: 'wrong-password', deviceName: 'Samsung S21' })
         .expect(HttpStatus.UNPROCESSABLE_ENTITY);
     });
   });
@@ -41,7 +41,7 @@ describe('Auth', () => {
 
       return request(app.getHttpServer())
         .post('/api/auth/register')
-        .send({ ...data, password: 'password' })
+        .send({ ...data, password: 'password', deviceName: 'Samsung S21' })
         .expect(HttpStatus.CREATED);
     });
 
@@ -51,7 +51,7 @@ describe('Auth', () => {
 
       return request(app.getHttpServer())
         .post('/api/auth/register')
-        .send({ ...data, username: user.username })
+        .send({ ...data, username: user.username, deviceName: 'Samsung S21' })
         .expect(HttpStatus.UNPROCESSABLE_ENTITY);
     });
 
@@ -61,21 +61,23 @@ describe('Auth', () => {
 
       return request(app.getHttpServer())
         .post('/api/auth/register')
-        .send({ ...data, email: user.email })
+        .send({ ...data, email: user.email, deviceName: 'Samsung S21' })
         .expect(HttpStatus.UNPROCESSABLE_ENTITY);
     });
   });
 
-  describe('Refresh', () => {
-    it('users can get a new access token', async () => {
-      const { refreshToken } = await actingAs({ prisma, app });
+  describe('Logout', () => {
+    it('users can logout', async () => {
+      const { accessToken } = await actingAs({ prisma, app });
+      const lastAccessToken = await prisma.accessToken.findFirst({ orderBy: { id: 'desc' } });
 
-      const response = await request(app.getHttpServer())
-        .post('/api/auth/refresh')
-        .send({ refresh: refreshToken })
+      await request(app.getHttpServer())
+        .post('/api/auth/logout')
+        .auth(accessToken, { type: 'bearer' })
         .expect(HttpStatus.OK);
 
-      expect(response.body.refreshToken).toBe(refreshToken);
+      const result = await prisma.accessToken.findUnique({ where: { id: lastAccessToken.id } });
+      expect(result).toBeNull();
     });
   });
 

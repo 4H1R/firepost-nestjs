@@ -54,7 +54,7 @@ export const actingAs = async ({ app, prisma, user }: ActingAs): Promise<ActingA
   const currentUser = user ? user : await createUser({ prisma });
   const response = await request(app.getHttpServer())
     .post('/api/auth/login')
-    .send({ email: currentUser.email, password: 'password' });
+    .send({ email: currentUser.email, password: 'password', deviceName: 'Samsung S21' });
 
   return { ...response.body, decodedId: hashIds.decode(response.body.user.id)[0] };
 };

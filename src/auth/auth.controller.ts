@@ -1,9 +1,10 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AccessToken } from '@prisma/client';
 
 import { AuthService } from './auth.service';
-import { Public } from './decorator';
-import { LoginDto, RegisterDto, RefreshDto } from './dto';
+import { CurrentAccessToken, Public } from './decorator';
+import { LoginDto, RegisterDto } from './dto';
 import { AuthResponse } from './response';
 
 @ApiTags('auth')
@@ -14,21 +15,22 @@ export class AuthController {
   @Public()
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() registerDto: RegisterDto): Promise<AuthResponse> {
+  register(@Body() registerDto: RegisterDto): Promise<AuthResponse> {
     return this.authService.register(registerDto);
   }
 
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto): Promise<AuthResponse> {
+  login(@Body() loginDto: LoginDto): Promise<AuthResponse> {
     return this.authService.login(loginDto);
   }
 
-  @Public()
-  @Post('refresh')
+  @ApiBearerAuth()
+  @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async refresh(@Body() refreshDto: RefreshDto): Promise<AuthResponse> {
-    return this.authService.refresh(refreshDto.refresh);
+  async logout(@CurrentAccessToken() accessToken: AccessToken) {
+    await this.authService.logout(accessToken);
+    return { message: "You've logged out successfully." };
   }
 }
