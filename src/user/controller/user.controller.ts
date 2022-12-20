@@ -10,7 +10,7 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
 import { UserService } from '../service';
@@ -39,6 +39,7 @@ export class UserController {
     return { ...result, data: users };
   }
 
+  @ApiParam({ name: 'username' })
   @Get(':username')
   @HttpCode(HttpStatus.OK)
   async findOne(
@@ -49,6 +50,7 @@ export class UserController {
     return ProfileResource.toJson(user);
   }
 
+  @ApiParam({ name: 'username' })
   @Patch(':username')
   @HttpCode(HttpStatus.OK)
   async update(
@@ -61,6 +63,7 @@ export class UserController {
     return AuthResource.toJson(user);
   }
 
+  @ApiParam({ name: 'username' })
   @Delete(':username')
   @HttpCode(HttpStatus.OK)
   remove(

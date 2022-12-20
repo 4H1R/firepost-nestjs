@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Param, Delete, Query, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
 import { CurrentUser } from 'src/auth/decorator';
@@ -17,6 +17,7 @@ export class PostLikeController {
     private readonly likeService: PostLikeService,
   ) {}
 
+  @ApiParam({ name: 'id' })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Param('id', new ParseHashIdsPipe()) id, @CurrentUser() currentUser: User) {
@@ -25,6 +26,7 @@ export class PostLikeController {
     return { message: 'You liked this post successfully.' };
   }
 
+  @ApiParam({ name: 'id' })
   @Get()
   @HttpCode(HttpStatus.OK)
   async findAll(@Param('id', new ParseHashIdsPipe()) id, @Query() dto: FindAllDto) {
@@ -33,6 +35,7 @@ export class PostLikeController {
     return { ...result, data: UserResource.toArrayJson(users) };
   }
 
+  @ApiParam({ name: 'id' })
   @Delete()
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id', new ParseHashIdsPipe()) id, @CurrentUser() currentUser: User) {

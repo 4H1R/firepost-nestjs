@@ -7,8 +7,8 @@ type IncludePostProps = {
 export const includePostData = ({ currentUserId }: IncludePostProps) => ({
   user: true,
   _count: { select: { likes: true, comments: true } },
-  likes: { where: { userId: currentUserId } },
-  saves: { where: { userId: currentUserId } },
+  likes: { where: { userId: currentUserId }, take: 1 },
+  saves: { where: { userId: currentUserId }, take: 1 },
 });
 
 export const orderLatestPost: Prisma.PostOrderByWithAggregationInput = {

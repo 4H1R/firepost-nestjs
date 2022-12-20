@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Param, Delete, Query, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
 import { CurrentUser } from 'src/auth/decorator';
 import { PaginateDto } from 'src/common/dto';
 import { ParseHashIdsPipe } from 'src/common/pipe';
 import { PostSaveService, PostService } from '../service';
-import { UserResource } from 'src/user/resource';
+import { PostResource } from '../resource';
 
 @ApiTags('post-saved')
 @ApiBearerAuth()
@@ -17,6 +17,7 @@ export class PostSaveController {
     private readonly saveService: PostSaveService,
   ) {}
 
+  @ApiParam({ name: 'id' })
   @Post(':id/saved')
   @HttpCode(HttpStatus.CREATED)
   async create(@Param('id', new ParseHashIdsPipe()) id, @CurrentUser() currentUser: User) {
@@ -29,10 +30,11 @@ export class PostSaveController {
   @HttpCode(HttpStatus.OK)
   async findAll(@CurrentUser() currentUser: User, @Query() dto: PaginateDto) {
     const result = await this.saveService.findAll({ ...dto, currentUser });
-    const users = result.data.map(({ user }) => user);
-    return { ...result, data: UserResource.toArrayJson(users) };
+    const posts = result.data.map(({ post }) => post);
+    return { ...result, data: PostResource.toArrayJson(posts) };
   }
 
+  @ApiParam({ name: 'id' })
   @Delete(':id/saved')
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id', new ParseHashIdsPipe()) id, @CurrentUser() currentUser: User) {

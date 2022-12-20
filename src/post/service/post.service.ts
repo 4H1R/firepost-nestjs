@@ -20,9 +20,9 @@ export class PostService {
     return paginate<Post, Prisma.PostFindManyArgs>(this.prisma.post, prismaQuery, { page });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, currentUserId: number) {
     const post = await this.prisma.post.findUnique({
-      include: includePostData({ currentUserId: 2 }),
+      include: includePostData({ currentUserId }),
       where: { id },
     });
 

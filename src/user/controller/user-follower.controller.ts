@@ -9,7 +9,7 @@ import {
   HttpStatus,
   Post,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
 import { UserService, FollowerService } from '../service';
@@ -27,6 +27,7 @@ export class UserFollowerController {
     private readonly followerService: FollowerService,
   ) {}
 
+  @ApiParam({ name: 'username' })
   @Get('followers')
   @HttpCode(HttpStatus.OK)
   async followers(
@@ -39,6 +40,7 @@ export class UserFollowerController {
     return { ...result, data };
   }
 
+  @ApiParam({ name: 'username' })
   @Get('followings')
   @HttpCode(HttpStatus.OK)
   async followings(
@@ -54,6 +56,7 @@ export class UserFollowerController {
     return { ...result, data };
   }
 
+  @ApiParam({ name: 'username' })
   @Post('followers')
   @HttpCode(HttpStatus.CREATED)
   async follow(
@@ -71,6 +74,7 @@ export class UserFollowerController {
     return { message: `You followed ${user.username} Successfully.` };
   }
 
+  @ApiParam({ name: 'username' })
   @Delete('followers')
   @HttpCode(HttpStatus.OK)
   async unFollow(

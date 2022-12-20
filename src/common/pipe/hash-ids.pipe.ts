@@ -9,6 +9,7 @@ export class ParseHashIdsPipe implements PipeTransform {
     const result = hashIds.decode(value)[0];
     if (!result) throw new ValidationErrorException({ [meta.data]: 'This field is not valid' });
 
+    console.log(result);
     return result;
   }
 }

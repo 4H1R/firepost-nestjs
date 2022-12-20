@@ -9,7 +9,7 @@ import {
   UnauthorizedException,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { User } from '@prisma/client';
 
 import { FindAllDto } from 'src/common/dto';
@@ -26,6 +26,7 @@ import { UserResource } from 'src/user/resource';
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
+  @ApiParam({ name: 'username' })
   @Post('users/:username/messages')
   async create(
     @Param('username', new ParseUsernamePipe()) username: string,
@@ -50,6 +51,7 @@ export class MessageController {
     return { ...users, data };
   }
 
+  @ApiParam({ name: 'username' })
   @Get('users/:username/messages')
   async findOne(
     @Param('username') username: string,
@@ -62,6 +64,7 @@ export class MessageController {
     return { ...messages, data };
   }
 
+  @ApiParam({ name: 'id' })
   @Patch('messages/:id')
   async update(
     @Param('id', new ParseHashIdsPipe()) id,
@@ -75,6 +78,7 @@ export class MessageController {
     return MessageResource.toJson(message);
   }
 
+  @ApiParam({ name: 'id' })
   @Delete('messages/:id')
   async remove(@Param('id', new ParseHashIdsPipe()) id, @CurrentUser() currentUser: User) {
     let message = await this.messageService.findUnique(id);

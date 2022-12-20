@@ -8,13 +8,13 @@ import { CreatePostLikeDto, DeletePostLikeDto, FindAllPostLikeDto } from '../dto
 @Injectable()
 export class PostLikeService {
   constructor(private readonly prisma: PrismaService) {}
-  async findOne(data: CreatePostLikeDto) {
+  findOne(data: CreatePostLikeDto) {
     return this.prisma.postLike.findUnique({ where: { userId_postId: data } });
   }
 
   async create(data: CreatePostLikeDto) {
     const isLiked = await this.findOne(data);
-    if (!isLiked) this.prisma.postLike.create({ data });
+    if (!isLiked) await this.prisma.postLike.create({ data });
   }
 
   findAll({ page, postId }: FindAllPostLikeDto) {
@@ -34,6 +34,6 @@ export class PostLikeService {
 
   async remove(data: DeletePostLikeDto) {
     const isLiked = await this.findOne(data);
-    if (isLiked) this.prisma.postLike.delete({ where: { userId_postId: data } });
+    if (isLiked) await this.prisma.postLike.delete({ where: { userId_postId: data } });
   }
 }
