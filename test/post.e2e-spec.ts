@@ -110,6 +110,63 @@ describe('Post', () => {
     });
   });
 
+  describe('Saved', () => {
+    it('users can get list of posts that they saved', async () => {
+      return request(app.getHttpServer())
+        .get(`/api/posts/saved`)
+        .auth(loginResponse.accessToken, { type: 'bearer' })
+        .expect(HttpStatus.OK);
+    });
+  });
+
+  describe('Save', () => {
+    it('users can save posts', async () => {
+      const post = await prisma.post.create({
+        data: postFactory({ userId: loginResponse.decodedId }),
+      });
+
+      await request(app.getHttpServer())
+        .post(`/api/posts/${hashIds.encode(post.id)}/saved`)
+        .auth(loginResponse.accessToken, { type: 'bearer' })
+        .expect(HttpStatus.CREATED);
+
+      const result = await prisma.postSave.findUnique({
+        where: {
+          userId_postId: {
+            userId: post.userId,
+            postId: post.id,
+          },
+        },
+      });
+
+      expect(result).toBeDefined();
+    });
+  });
+
+  describe('Un Save', () => {
+    it('users can un save posts', async () => {
+      const post = await prisma.post.create({
+        data: postFactory({ userId: loginResponse.decodedId }),
+      });
+
+      await request(app.getHttpServer())
+        .delete(`/api/posts/${hashIds.encode(post.id)}/saved`)
+        .auth(loginResponse.accessToken, { type: 'bearer' })
+        .expect(HttpStatus.OK);
+
+      const result = await prisma.postSave.findUnique({
+        where: {
+          userId_postId: {
+            userId: post.userId,
+            postId: post.id,
+          },
+        },
+      });
+
+      expect(result).toBeNull();
+    });
+  });
+
   afterAll(async () => {
     await app.close();
   });

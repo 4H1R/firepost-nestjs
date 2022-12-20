@@ -19,11 +19,11 @@ import {
 @Module({
   imports: [UserModule],
   controllers: [
+    PostSaveController,
     PostController,
     PostUserController,
     PostLikeController,
     PostCommentController,
-    PostSaveController,
   ],
   providers: [PostService, PostUserService, PostLikeService, PostCommentService, PostSaveService],
   exports: [PostService],

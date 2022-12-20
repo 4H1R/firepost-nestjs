@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PostSave, Prisma, User } from '@prisma/client';
 import { paginate } from 'lib/paginator';
+import { FindAllDto } from 'src/common/dto';
 
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreatePostLikeDto, DeletePostLikeDto, FindAllPostLikeDto } from '../dto';
+import {
+  CreatePostLikeDto,
+  DeletePostLikeDto,
+  FindAllPostLikeDto,
+  FindAllPostSaveDto,
+} from '../dto';
 
 @Injectable()
 export class PostSaveService {
@@ -16,9 +22,9 @@ export class PostSaveService {
     return this.findOne(data) ?? this.prisma.postSave.create({ data });
   }
 
-  findAll({ page, postId }: FindAllPostLikeDto) {
+  findAll({ page, currentUser }: FindAllPostSaveDto) {
     const prismaQuery: Prisma.PostSaveFindManyArgs = {
-      where: { postId },
+      where: { userId: currentUser.id },
       include: { user: true },
     };
 
