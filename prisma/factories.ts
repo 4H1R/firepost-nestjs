@@ -22,7 +22,9 @@ type PostFactory = {
 
 export const postFactory = (data: PostFactory): Prisma.PostCreateManyInput => ({
   ...data,
-  image: faker.image.abstract(500, 500, true),
+  images: Array.from({ length: faker.datatype.number({ min: 1, max: 10 }) }).map(() =>
+    faker.image.abstract(500, 500, true),
+  ),
   description: faker.lorem.paragraphs(faker.datatype.number({ min: 2, max: 5 })),
 });
 

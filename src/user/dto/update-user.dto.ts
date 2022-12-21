@@ -20,4 +20,9 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   bio?: string;
+
+  @MaxLength(255)
+  @IsString()
+  @IsOptional()
+  website?: string;
 }

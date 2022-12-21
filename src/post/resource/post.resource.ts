@@ -9,7 +9,7 @@ export class PostResource extends JsonResource {
       id: hashIds.encode(post.id),
       userId: hashIds.encode(post.userId),
       description: post.description,
-      image: post.image,
+      images: post.images,
       updatedAt: post.updatedAt,
       createdAt: post.createdAt,
     };
